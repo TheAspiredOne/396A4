@@ -71,6 +71,38 @@ def get_init_start_goal(grid):
 	return (exp_start,exp_goal)
 
 
+def plot():
+		
+	coorXmanhattan=np.load("coorXmanhattan.npy")
+	coorYOpenCloseRatiomanhattan=np.load("coorYOpenCloseRatiomanhattan.npy")
+	sd_err_ratiomanhattan=np.load("sd_err_ratiomanhattan.npy")
+	coorYtimemanhattan=np.load("coorYtimemanhattan.npy")
+	sd_timemanhattan=np.load("sd_timemanhattan.npy")
+
+	coorXzero=np.load("coorXzero.npy")
+	coorYOpenCloseRatiozero=np.load("coorYOpenCloseRatiozero.npy")
+	sd_err_ratiozero=np.load("sd_err_ratiozero.npy")
+	coorYtimezero=np.load("coorYtimezero.npy")
+	sd_timezero=np.load("sd_timezero.npy")
+
+	n='\n'
+	# print(sd_timemanhattan, len)
+	# print(len(coorXzero),len(coorYOpenCloseRatiozero),len(sd_err_ratiozero),len(coorYtimezero),len(sd_timezero))
+	plt.xlabel('Buckets')
+	plt.ylabel('Open/Close ratio')
+	# plt.ylabel('Runtime/s')
+	plt.title('The ratio of Open/Close of lazy-A*')
+	# plt.title('Runtime of lazy-A*')
+	plt.xlim([0,512])
+	# plt.errorbar(coorXzero,coorYtimezero,sd_timezero, label="No heuristic")
+	# plt.errorbar(coorXmanhattan,coorYtimemanhattan,sd_timemanhattan,label="Manhattan Distance heuristic")
+	plt.errorbar(coorXmanhattan,coorYOpenCloseRatiomanhattan,sd_err_ratiomanhattan, label = 'Manhattan Distance heuristic')
+	plt.errorbar(coorXzero,coorYOpenCloseRatiozero,sd_err_ratiozero, label = "No heuristic")
+	plt.legend()
+	plt.show()
+
+
+
 def plotdata():
 	f = open('results_H', 'r') #open our manhattan heuristics results
 	g = open('results_0', 'r') #open our no heuristics implementation results
@@ -115,8 +147,10 @@ def plotdata():
 				raw_results[bucket_id].append(res)
 
 
+		
 		#calculate avg by divided all values in bucket_values by the counter
 		for i in range(8,520,8):
+			
 			bucket_values[i][0]/=bucket_values[i][2]
 			bucket_values[i][1]/=bucket_values[i][2]
 			bucket_values[i][3]/=bucket_values[i][2]
@@ -133,6 +167,7 @@ def plotdata():
 		sd_ratio = dict()
 		sd_time = dict()
 		for i in range(8,520,8):
+
 			avg_ratio = bucket_values[i][0]/bucket_values[i][1]#Open/Closed ratio
 			numerator_ratio = 0
 			ratio_count = 0
@@ -159,23 +194,25 @@ def plotdata():
 			sd_err_ratio.append(sd_ratio[i])
 			sd_err_time.append(sd_time[i])
 
+		coorX=np.asarray(coorX)
+		coorYOpenCloseRatio=np.asarray(coorYOpenCloseRatio)
+		sd_err_ratio=np.asarray(sd_err_ratio)
+		coorYtime=np.asarray(coorYtime)
+		sd_err_time=np.asarray(sd_err_time)
+		print(sd_err_time, type(sd_err_ratio))
+
+		np.save("coorX"+unt,coorX)
+		np.save("coorYOpenCloseRatio"+unt,coorYOpenCloseRatio)
+		np.save("sd_err_ratio"+unt,sd_err_ratio)
+		np.save("coorYtime"+unt,coorYtime)
+		np.save("sd_time"+unt,sd_err_time)
+
 		data[unt]=(coorX, coorYOpenCloseRatio, sd_err_ratio, coorYtime, sd_time)
 
 	f.close()
 	g.close()
-	manhattan_h_data=data['manhattan']
-	zero_data = data['zero']
+	plot()
 	
-	#plot the data
-	plt.xlabel('Buckets')
-	plt.ylabel('Runtime/s')
-	plt.title('Runtime of lazy-A*')
-	plt.xlim([0,512])
-	plt.errorbar(manhattan_h_data[0],manhattan_h_data[1],manhattan_h_data[2])
-	plt.errorbar(manhattan_h_data[0],manhattan_h_data[3],manhattan_h_data[4])
-	plt.errorbar(zero_data[0],zero_data[1],zero_data[2])
-	plt.errorbar(zero_data[0],zero_data[3],zero_data[4])
-	plt.show()
 
 
 if __name__ == '__main__':
